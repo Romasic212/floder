@@ -1,7 +1,7 @@
 ﻿<Window x:Class="floder.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="SyncApp" Height="500" Width="400">
+        Title="SyncApp" Height="520" Width="400">
 
     <StackPanel Margin="10">
 
@@ -13,14 +13,22 @@
 
         <TextBlock Name="TxtFolder" Margin="0,10,0,10"/>
 
-        <Button Click="BtnFindDevices_Click">
+        <!-- ПОДПИСЬ ВМЕСТО PLACEHOLDER -->
+        <TextBlock Text="Введите IP:" Margin="0,10,0,0"/>
+        <TextBox Name="TxtIP" Margin="0,5"/>
+
+        <Button Click="BtnConnectManual_Click">
+            Подключиться по IP
+        </Button>
+
+        <Button Click="BtnFindDevices_Click" Margin="0,10,0,0">
             Найти устройства
         </Button>
 
         <ListBox Name="DevicesList" Height="100"/>
 
         <Button Click="BtnConnectSelected_Click">
-            Подключиться
+            Подключиться к выбранному
         </Button>
 
         <ListBox Name="FilesList" Margin="0,10,0,0"/>

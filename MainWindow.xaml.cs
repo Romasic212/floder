@@ -44,16 +44,15 @@ namespace floder
 
                 foreach (var file in toSend)
                 {
-                    var ip = _devices.First(d => DevicesList.SelectedItem.ToString().Contains(d.Key)).Key;
-                    await _tcp.SendFile(ip, _currentFolder, file.Path);
+                    var ip = GetSelectedIP();
+                    if (ip != null)
+                        await _tcp.SendFile(ip, _currentFolder, file.Path);
                 }
             };
 
             _udp.OnDeviceFound += (ip, name) =>
             {
-                // ❗ ФИЛЬТР САМОГО СЕБЯ
-                if (ip == _myIp)
-                    return;
+                if (ip == _myIp) return;
 
                 Dispatcher.Invoke(() =>
                 {
@@ -69,6 +68,23 @@ namespace floder
             _udp.StartListening();
         }
 
+        private string GetSelectedIP()
+        {
+            if (DevicesList.SelectedItem == null) return null;
+
+            var selected = DevicesList.SelectedItem.ToString();
+            return _devices.First(d => selected.Contains(d.Key)).Key;
+        }
+
+        // 🔥 РУЧНОЕ ПОДКЛЮЧЕНИЕ
+        private async void BtnConnectManual_Click(object sender, RoutedEventArgs e)
+        {
+            if (_currentFiles == null || string.IsNullOrWhiteSpace(TxtIP.Text))
+                return;
+
+            await _tcp.SendIndex(TxtIP.Text, _currentFiles);
+        }
+
         private async void BtnFindDevices_Click(object sender, RoutedEventArgs e)
         {
             DevicesList.Items.Clear();
@@ -79,12 +95,11 @@ namespace floder
 
         private async void BtnConnectSelected_Click(object sender, RoutedEventArgs e)
         {
-            if (DevicesList.SelectedItem == null || _currentFiles == null) return;
+            if (_currentFiles == null) return;
 
-            var selected = DevicesList.SelectedItem.ToString();
-            var ip = _devices.First(d => selected.Contains(d.Key)).Key;
-
-            await _tcp.SendIndex(ip, _currentFiles);
+            var ip = GetSelectedIP();
+            if (ip != null)
+                await _tcp.SendIndex(ip, _currentFiles);
         }
 
         private string GetLocalIP()
