@@ -19,29 +19,46 @@ namespace floder.Network
 
         public void StartServer(int port = 9000)
         {
-            _listener = new TcpListener(IPAddress.Any, port);
-            _listener.Start();
-
-            Task.Run(async () =>
+            try
             {
-                while (true)
+                _listener = new TcpListener(IPAddress.Any, port);
+                _listener.Start();
+
+                OnMessageReceived?.Invoke($"Сервер запущен на порту {port}");
+
+                Task.Run(async () =>
                 {
-                    var client = await _listener.AcceptTcpClientAsync();
-                    HandleClient(client);
-                }
-            });
+                    while (true)
+                    {
+                        var client = await _listener.AcceptTcpClientAsync();
+                        OnMessageReceived?.Invoke("Кто-то подключился");
+                        HandleClient(client);
+                    }
+                });
+            }
+            catch (Exception ex)
+            {
+                OnMessageReceived?.Invoke("Ошибка сервера: " + ex.Message);
+            }
         }
 
         private async void HandleClient(TcpClient client)
         {
-            var stream = client.GetStream();
+            try
+            {
+                var stream = client.GetStream();
 
-            int type = stream.ReadByte();
+                int type = stream.ReadByte();
 
-            if (type == 1)
-                await HandleIndex(stream);
-            else if (type == 2)
-                await HandleFile(stream);
+                if (type == 1)
+                    await HandleIndex(stream);
+                else if (type == 2)
+                    await HandleFile(stream);
+            }
+            catch (Exception ex)
+            {
+                OnMessageReceived?.Invoke("Ошибка при приёме: " + ex.Message);
+            }
         }
 
         private async Task HandleIndex(NetworkStream stream)
@@ -90,40 +107,60 @@ namespace floder.Network
 
         public async Task SendIndex(string ip, List<FileMeta> files)
         {
-            var client = new TcpClient();
-            await client.ConnectAsync(IPAddress.Parse(ip), 9000);
+            try
+            {
+                OnMessageReceived?.Invoke($"Пробуем подключиться к {ip}...");
 
-            var stream = client.GetStream();
+                var client = new TcpClient();
+                await client.ConnectAsync(IPAddress.Parse(ip), 9000);
 
-            stream.WriteByte(1);
+                OnMessageReceived?.Invoke("Подключение успешно!");
 
-            var json = JsonSerializer.Serialize(files);
-            var data = Encoding.UTF8.GetBytes(json);
+                var stream = client.GetStream();
 
-            await stream.WriteAsync(data, 0, data.Length);
+                stream.WriteByte(1);
+
+                var json = JsonSerializer.Serialize(files);
+                var data = Encoding.UTF8.GetBytes(json);
+
+                await stream.WriteAsync(data, 0, data.Length);
+
+                OnMessageReceived?.Invoke("Индекс отправлен");
+            }
+            catch (Exception ex)
+            {
+                OnMessageReceived?.Invoke("Ошибка подключения: " + ex.Message);
+            }
         }
 
         public async Task SendFile(string ip, string rootFolder, string filePath)
         {
-            var client = new TcpClient();
-            await client.ConnectAsync(IPAddress.Parse(ip), 9000);
+            try
+            {
+                var client = new TcpClient();
+                await client.ConnectAsync(IPAddress.Parse(ip), 9000);
 
-            var stream = client.GetStream();
+                var stream = client.GetStream();
 
-            stream.WriteByte(2);
+                stream.WriteByte(2);
 
-            var writer = new BinaryWriter(stream);
+                var writer = new BinaryWriter(stream);
 
-            var relativePath = Path.GetRelativePath(rootFolder, filePath);
-            var info = new FileInfo(filePath);
+                var relativePath = Path.GetRelativePath(rootFolder, filePath);
+                var info = new FileInfo(filePath);
 
-            writer.Write(relativePath);
-            writer.Write(info.Length);
+                writer.Write(relativePath);
+                writer.Write(info.Length);
 
-            using var file = File.OpenRead(filePath);
-            await file.CopyToAsync(stream);
+                using var file = File.OpenRead(filePath);
+                await file.CopyToAsync(stream);
 
-            OnMessageReceived?.Invoke($"Отправлен файл: {relativePath}");
+                OnMessageReceived?.Invoke($"Отправлен файл: {relativePath}");
+            }
+            catch (Exception ex)
+            {
+                OnMessageReceived?.Invoke("Ошибка отправки файла: " + ex.Message);
+            }
         }
     }
 }

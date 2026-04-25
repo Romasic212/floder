@@ -5,33 +5,19 @@
 
     <StackPanel Margin="10">
 
-        <TextBlock Name="TxtMyIP" FontWeight="Bold" Margin="0,0,0,10"/>
-
         <Button Click="BtnSelectFolder_Click">
             Выбрать папку
         </Button>
 
-        <TextBlock Name="TxtFolder" Margin="0,10,0,10"/>
-
-        <!-- ПОДПИСЬ ВМЕСТО PLACEHOLDER -->
-        <TextBlock Text="Введите IP:" Margin="0,10,0,0"/>
-        <TextBox Name="TxtIP" Margin="0,5"/>
-
-        <Button Click="BtnConnectManual_Click">
-            Подключиться по IP
+        <Button Click="BtnConnect_Click">
+            Подключиться к серверу
         </Button>
 
-        <Button Click="BtnFindDevices_Click" Margin="0,10,0,0">
-            Найти устройства
+        <Button Click="BtnSendIndex_Click">
+            Отправить индекс
         </Button>
 
-        <ListBox Name="DevicesList" Height="100"/>
-
-        <Button Click="BtnConnectSelected_Click">
-            Подключиться к выбранному
-        </Button>
-
-        <ListBox Name="FilesList" Margin="0,10,0,0"/>
+        <ListBox Name="FilesList"/>
 
     </StackPanel>
 </Window>

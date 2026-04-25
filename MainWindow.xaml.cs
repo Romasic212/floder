@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
-using System.Net;
-using System.Net.Sockets;
+using System.Text.Json;
 using System.Windows;
 using Microsoft.Win32;
 using floder.Core;
@@ -14,105 +13,36 @@ namespace floder
     {
         private Indexer _indexer = new Indexer();
         private FolderWatcher _watcher = new FolderWatcher();
-        private TcpService _tcp = new TcpService();
-        private UdpDiscovery _udp = new UdpDiscovery();
+        private WebSocketService _ws = new WebSocketService();
 
         private List<FileMeta> _currentFiles;
-        private string _currentFolder;
-
-        private Dictionary<string, string> _devices = new();
-        private string _myIp;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            _myIp = GetLocalIP();
-            TxtMyIP.Text = "Мой IP: " + _myIp;
-
             _watcher.OnChanged += msg =>
                 Dispatcher.Invoke(() => FilesList.Items.Add(msg));
 
-            _tcp.OnMessageReceived += msg =>
-                Dispatcher.Invoke(() => FilesList.Items.Add(msg));
-
-            _tcp.OnIndexReceived += async remoteFiles =>
+            _ws.OnMessage += msg =>
             {
-                var toSend = _currentFiles
-                    .Where(local => !remoteFiles.Any(r => r.Path == local.Path))
-                    .ToList();
-
-                foreach (var file in toSend)
-                {
-                    var ip = GetSelectedIP();
-                    if (ip != null)
-                        await _tcp.SendFile(ip, _currentFolder, file.Path);
-                }
-            };
-
-            _udp.OnDeviceFound += (ip, name) =>
-            {
-                if (ip == _myIp) return;
-
                 Dispatcher.Invoke(() =>
                 {
-                    if (!_devices.ContainsKey(ip))
-                    {
-                        _devices[ip] = name;
-                        DevicesList.Items.Add($"{name} ({ip})");
-                    }
+                    FilesList.Items.Add("Получено: " + msg);
                 });
             };
-
-            _tcp.StartServer();
-            _udp.StartListening();
         }
 
-        private string GetSelectedIP()
+        private async void BtnConnect_Click(object sender, RoutedEventArgs e)
         {
-            if (DevicesList.SelectedItem == null) return null;
-
-            var selected = DevicesList.SelectedItem.ToString();
-            return _devices.First(d => selected.Contains(d.Key)).Key;
+            await _ws.Connect("ws://localhost:5000/ws");
+            FilesList.Items.Add("Подключено к серверу");
         }
 
-        // 🔥 РУЧНОЕ ПОДКЛЮЧЕНИЕ
-        private async void BtnConnectManual_Click(object sender, RoutedEventArgs e)
+        private async void BtnSendIndex_Click(object sender, RoutedEventArgs e)
         {
-            if (_currentFiles == null || string.IsNullOrWhiteSpace(TxtIP.Text))
-                return;
-
-            await _tcp.SendIndex(TxtIP.Text, _currentFiles);
-        }
-
-        private async void BtnFindDevices_Click(object sender, RoutedEventArgs e)
-        {
-            DevicesList.Items.Clear();
-            _devices.Clear();
-
-            await _udp.Broadcast();
-        }
-
-        private async void BtnConnectSelected_Click(object sender, RoutedEventArgs e)
-        {
-            if (_currentFiles == null) return;
-
-            var ip = GetSelectedIP();
-            if (ip != null)
-                await _tcp.SendIndex(ip, _currentFiles);
-        }
-
-        private string GetLocalIP()
-        {
-            var host = Dns.GetHostEntry(Dns.GetHostName());
-
-            foreach (var ip in host.AddressList)
-            {
-                if (ip.AddressFamily == AddressFamily.InterNetwork)
-                    return ip.ToString();
-            }
-
-            return "Не найден";
+            var json = JsonSerializer.Serialize(_currentFiles);
+            await _ws.Send(json);
         }
 
         private void BtnSelectFolder_Click(object sender, RoutedEventArgs e)
@@ -127,10 +57,6 @@ namespace floder
             if (dialog.ShowDialog() == true)
             {
                 var folderPath = System.IO.Path.GetDirectoryName(dialog.FileName);
-
-                _currentFolder = folderPath;
-
-                TxtFolder.Text = folderPath;
 
                 _currentFiles = _indexer.Scan(folderPath);
 
