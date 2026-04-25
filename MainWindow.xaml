@@ -1,0 +1,29 @@
+﻿<Window x:Class="floder.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SyncApp" Height="500" Width="400">
+
+    <StackPanel Margin="10">
+
+        <TextBlock Name="TxtMyIP" FontWeight="Bold" Margin="0,0,0,10"/>
+
+        <Button Click="BtnSelectFolder_Click">
+            Выбрать папку
+        </Button>
+
+        <TextBlock Name="TxtFolder" Margin="0,10,0,10"/>
+
+        <Button Click="BtnFindDevices_Click">
+            Найти устройства
+        </Button>
+
+        <ListBox Name="DevicesList" Height="100"/>
+
+        <Button Click="BtnConnectSelected_Click">
+            Подключиться
+        </Button>
+
+        <ListBox Name="FilesList" Margin="0,10,0,0"/>
+
+    </StackPanel>
+</Window>
