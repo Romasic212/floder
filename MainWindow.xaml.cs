@@ -21,12 +21,14 @@ namespace floder
         private string _currentFolder;
 
         private Dictionary<string, string> _devices = new();
+        private string _myIp;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            TxtMyIP.Text = "Мой IP: " + GetLocalIP();
+            _myIp = GetLocalIP();
+            TxtMyIP.Text = "Мой IP: " + _myIp;
 
             _watcher.OnChanged += msg =>
                 Dispatcher.Invoke(() => FilesList.Items.Add(msg));
@@ -49,6 +51,10 @@ namespace floder
 
             _udp.OnDeviceFound += (ip, name) =>
             {
+                // ❗ ФИЛЬТР САМОГО СЕБЯ
+                if (ip == _myIp)
+                    return;
+
                 Dispatcher.Invoke(() =>
                 {
                     if (!_devices.ContainsKey(ip))
