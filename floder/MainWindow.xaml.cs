@@ -41,8 +41,13 @@ namespace floder
 
         private async void BtnSendIndex_Click(object sender, RoutedEventArgs e)
         {
-            var json = JsonSerializer.Serialize(_currentFiles);
-            await _ws.Send(json);
+            if (_currentFiles == null)
+            {
+                FilesList.Items.Add("❌ Сначала выбери папку");
+                return;
+            }
+
+            await _ws.Send(System.Text.Json.JsonSerializer.Serialize(_currentFiles));
         }
 
         private void BtnSelectFolder_Click(object sender, RoutedEventArgs e)
