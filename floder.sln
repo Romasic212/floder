@@ -5,7 +5,7 @@ VisualStudioVersion = 17.14.36930.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "floder", "floder.csproj", "{890C9E62-B209-4D62-96BF-F0B91203D9FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "floder-server", "..\floder-server\floder-server.csproj", "{9BDACDFB-3852-4CFB-9290-87776F214201}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sever", "..\sever\sever.csproj", "{FFC4147D-6FE2-4269-BFDB-97788012C37C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,10 +17,10 @@ Global
 		{890C9E62-B209-4D62-96BF-F0B91203D9FF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{890C9E62-B209-4D62-96BF-F0B91203D9FF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{890C9E62-B209-4D62-96BF-F0B91203D9FF}.Release|Any CPU.Build.0 = Release|Any CPU
-		{9BDACDFB-3852-4CFB-9290-87776F214201}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{9BDACDFB-3852-4CFB-9290-87776F214201}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{9BDACDFB-3852-4CFB-9290-87776F214201}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{9BDACDFB-3852-4CFB-9290-87776F214201}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FFC4147D-6FE2-4269-BFDB-97788012C37C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FFC4147D-6FE2-4269-BFDB-97788012C37C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FFC4147D-6FE2-4269-BFDB-97788012C37C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FFC4147D-6FE2-4269-BFDB-97788012C37C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -35,7 +35,7 @@ namespace floder
 
         private async void BtnConnect_Click(object sender, RoutedEventArgs e)
         {
-            await _ws.Connect("ws://localhost:5000/ws");
+            await _ws.Connect("ws://192.168.0.127:5000/ws");
             FilesList.Items.Add("Подключено к серверу");
         }
 
